@@ -236,7 +236,8 @@ GDBRemoteCommunication::WaitForPacketNoLock(StringExtractorGDBRemote &packet,
   Log *log = GetLog(GDBRLog::Packets);
 
   // Check for a packet from our cache first without trying any reading...
-  if (CheckForPacket(nullptr, 0, packet) != PacketType::Invalid)
+  // No notifications are currently supported so they should be ignored.
+  if (CheckForPacket(nullptr, 0, packet) == PacketType::Standard)
     return PacketResult::Success;
 
   bool timed_out = false;
@@ -252,7 +253,7 @@ GDBRemoteCommunication::WaitForPacketNoLock(StringExtractorGDBRemote &packet,
               bytes_read);
 
     if (bytes_read > 0) {
-      if (CheckForPacket(buffer, bytes_read, packet) != PacketType::Invalid)
+      if (CheckForPacket(buffer, bytes_read, packet) == PacketType::Standard)
         return PacketResult::Success;
     } else {
       switch (status) {
